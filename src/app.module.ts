@@ -9,6 +9,8 @@ import { ProductsModule } from './products/products.module';
 import { ReleasesModule } from './releases/releases.module';
 import { ArtifactsModule } from './artifacts/artifacts.module';
 import { GithubModule } from './github/github.module';
+import { DownloadsModule } from './downloads/downloads.module';
+import { AdminModule } from './admin/admin.module';
 import { getDatabaseConfig } from './config/database.config';
 
 @Module({
@@ -45,6 +47,8 @@ import { getDatabaseConfig } from './config/database.config';
     ReleasesModule,
     ArtifactsModule,
     GithubModule,
+    DownloadsModule,
+    AdminModule,
   ],
   providers: [
     {
