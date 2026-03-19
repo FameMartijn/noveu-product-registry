@@ -6,7 +6,23 @@ import helmet from 'helmet';
 import * as compression from 'compression';
 import { AppModule } from './app.module';
 
+function assertProductionSecrets() {
+  if (process.env.NODE_ENV !== 'production') return;
+
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret || jwtSecret === 'default_jwt_secret' || jwtSecret.length < 32) {
+    throw new Error('Production requires a strong JWT_SECRET (min 32 chars)');
+  }
+
+  const dbPassword = process.env.DB_PASSWORD;
+  if (!dbPassword || dbPassword === 'password' || dbPassword === 'postgres') {
+    throw new Error('Production requires a strong DB_PASSWORD');
+  }
+}
+
 async function bootstrap() {
+  assertProductionSecrets();
+
   const logger = new Logger('ProductRegistryService');
 
   const app = await NestFactory.create(AppModule, {
