@@ -104,7 +104,7 @@ export class ReleasesService {
       name: product.name,
       slug: product.slug,
       version: latest.version,
-      download_url: `${baseUrl}/api/v1/products/${product.slug}/download/wordpress`,
+      download_url: `${baseUrl}/api/distribution/products/${product.slug}/download/wordpress`,
       requires: metadata.requires || '6.0',
       tested: metadata.tested || '6.5',
       requires_php: metadata.requires_php || '8.2',
