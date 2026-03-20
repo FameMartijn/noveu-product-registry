@@ -34,7 +34,13 @@ async function bootstrap() {
 
   app.use(
     helmet({
-      contentSecurityPolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'none'"],
+          frameSrc: ["'none'"],
+          scriptSrc: ["'none'"],
+        },
+      },
       crossOriginEmbedderPolicy: false,
       referrerPolicy: { policy: 'no-referrer' },
     }),
