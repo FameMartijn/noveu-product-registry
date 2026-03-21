@@ -70,4 +70,27 @@ export class ReleasesController {
     }
     return result;
   }
+
+  @Get('releases/latest')
+  @Throttle({ default: { limit: 200, ttl: 60000 } })
+  @ApiOperation({
+    summary: 'Laatste release voor WordPress plugin',
+    description:
+      'Retourneert de laatste stable release in het formaat dat de WordPress UpdateChecker verwacht: ' +
+      'version, download_url, changelog, description, tested_wp, requires_php, released_at, download_count',
+  })
+  @ApiParam({ name: 'slug', example: 'noveuflow' })
+  @ApiResponse({ status: 200, description: 'Laatste release gevonden' })
+  @ApiResponse({ status: 404, description: 'Product niet gevonden of geen releases beschikbaar' })
+  async getLatestRelease(@Param('slug') slug: string) {
+    const result = await this.releasesService.getLatestReleaseResponse(slug);
+    if (!result) {
+      return {
+        success: true,
+        data: null,
+        message: 'Geen releases beschikbaar',
+      };
+    }
+    return result;
+  }
 }

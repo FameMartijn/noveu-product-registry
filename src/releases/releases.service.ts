@@ -32,6 +32,17 @@ export interface UpdateCheckResponse {
   };
 }
 
+export interface LatestReleaseResponse {
+  version: string;
+  download_url: string;
+  changelog: string;
+  description: string;
+  tested_wp: string;
+  requires_php: string;
+  released_at: string;
+  download_count: number;
+}
+
 @Injectable()
 export class ReleasesService {
   private readonly logger = new Logger(ReleasesService.name);
@@ -111,6 +122,43 @@ export class ReleasesService {
       sections: {
         changelog: latest.changelog || '',
       },
+    };
+  }
+
+  async getLatestReleaseResponse(
+    slug: string,
+  ): Promise<LatestReleaseResponse | null> {
+    const product = await this.productRepo.findOne({ where: { slug } });
+    if (!product) {
+      throw new NotFoundException(`Product met slug '${slug}' niet gevonden`);
+    }
+
+    const latest = await this.getLatestRelease(product.id, ReleaseChannel.STABLE);
+    if (!latest) {
+      return null;
+    }
+
+    const baseUrl = process.env.PUBLIC_API_URL || 'https://api.noveu.eu';
+    const metadata = latest.metadata || {};
+
+    const totalDownloads = (latest.artifacts || []).reduce(
+      (sum, artifact) => sum + (artifact.downloadCount || 0),
+      0,
+    );
+
+    return {
+      version: latest.version,
+      download_url: `${baseUrl}/api/distribution/products/${product.slug}/download/wordpress`,
+      changelog: latest.changelog || '',
+      description:
+        product.description ||
+        'All-in-one appointment scheduling, CRM, and business management for service-based businesses.',
+      tested_wp: metadata.tested || '6.7',
+      requires_php: metadata.requires_php || '8.2',
+      released_at: latest.publishedAt
+        ? latest.publishedAt.toISOString()
+        : '',
+      download_count: totalDownloads,
     };
   }
 
